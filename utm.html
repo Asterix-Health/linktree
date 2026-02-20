@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UTM Builder — Asterix</title>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-GTVX4RHL5Z"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-GTVX4RHL5Z');
+  </script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #000;
+      color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      padding: 2rem;
+    }
+    .logo {
+      width: min(60vw, 320px);
+      margin-bottom: 2.5rem;
+    }
+    .container {
+      width: 100%;
+      max-width: 520px;
+    }
+    h1 {
+      font-size: 1.25rem;
+      font-weight: 500;
+      margin-bottom: 1.5rem;
+      text-align: center;
+      opacity: 0.9;
+    }
+    .field {
+      margin-bottom: 0.75rem;
+    }
+    .field label {
+      display: block;
+      font-size: 0.8rem;
+      color: #888;
+      margin-bottom: 0.25rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .field label .req {
+      color: #f87171;
+    }
+    .field input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1px solid #333;
+      border-radius: 8px;
+      background: #111;
+      color: #fff;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .field input:focus {
+      border-color: #555;
+    }
+    .field input::placeholder {
+      color: #555;
+    }
+    .preview {
+      margin-top: 1rem;
+      margin-bottom: 1rem;
+    }
+    .preview-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.25rem;
+    }
+    .preview-label span {
+      font-size: 0.8rem;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .toggle {
+      display: none;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.75rem;
+      color: #888;
+      cursor: pointer;
+      user-select: none;
+    }
+    .toggle.visible { display: flex; }
+    .toggle-track {
+      width: 28px;
+      height: 16px;
+      border-radius: 8px;
+      background: #333;
+      position: relative;
+      transition: background 0.15s;
+    }
+    .toggle-track.active {
+      background: #4ade80;
+    }
+    .toggle-thumb {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #fff;
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      transition: left 0.15s;
+    }
+    .toggle-track.active .toggle-thumb {
+      left: 14px;
+    }
+    .url-display {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1rem;
+      background: #111;
+      border: 1px solid #333;
+      border-radius: 8px;
+      min-height: 3rem;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .url-display.has-short {
+      background: #0a1f0a;
+      border-color: #1a3a1a;
+    }
+    .url-text {
+      flex: 1;
+      font-size: 0.9rem;
+      color: #999;
+      word-break: break-all;
+      line-height: 1.4;
+    }
+    .url-display.has-short .url-text {
+      color: #4ade80;
+    }
+    .url-text a {
+      color: inherit;
+      text-decoration: none;
+    }
+    .url-text a:hover { text-decoration: underline; }
+    .copy-btn {
+      flex-shrink: 0;
+      width: 32px;
+      height: 32px;
+      border: none;
+      border-radius: 6px;
+      background: transparent;
+      color: #666;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.15s, background 0.15s;
+      padding: 0;
+    }
+    .copy-btn:hover {
+      background: #222;
+      color: #fff;
+    }
+    .copy-btn.copied {
+      color: #4ade80;
+    }
+    .copy-btn svg {
+      width: 18px;
+      height: 18px;
+    }
+    .create-btn {
+      margin-top: 1rem;
+      width: 100%;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 8px;
+      background: #fff;
+      color: #000;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+    .create-btn:hover { opacity: 0.85; }
+    .create-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    .error {
+      margin-top: 0.75rem;
+      color: #f87171;
+      font-size: 0.875rem;
+      display: none;
+    }
+    .error.visible { display: block; }
+  </style>
+</head>
+<body>
+  <img src="assets/logo.png" alt="Asterix" class="logo">
+  <div class="container">
+    <h1>UTM Builder</h1>
+
+    <div class="field">
+      <label>Page URL <span class="req">*</span></label>
+      <input type="url" id="pageUrl" placeholder="https://asterix.health/..." autocomplete="off">
+    </div>
+    <div class="field">
+      <label>utm_source <span class="req">*</span></label>
+      <input type="text" id="utmSource" placeholder="e.g. google, newsletter" autocomplete="off">
+    </div>
+    <div class="field">
+      <label>utm_medium <span class="req">*</span></label>
+      <input type="text" id="utmMedium" placeholder="e.g. cpc, email, social" autocomplete="off">
+    </div>
+    <div class="field">
+      <label>utm_campaign <span class="req">*</span></label>
+      <input type="text" id="utmCampaign" placeholder="e.g. spring_sale" autocomplete="off">
+    </div>
+    <div class="field">
+      <label>utm_term</label>
+      <input type="text" id="utmTerm" placeholder="optional" autocomplete="off">
+    </div>
+    <div class="field">
+      <label>utm_content</label>
+      <input type="text" id="utmContent" placeholder="optional" autocomplete="off">
+    </div>
+
+    <div class="preview">
+      <div class="preview-label">
+        <span>Generated URL</span>
+        <label class="toggle" id="toggle" onclick="toggleView()">
+          <span id="toggleLabel">Show short</span>
+          <div class="toggle-track" id="toggleTrack">
+            <div class="toggle-thumb"></div>
+          </div>
+        </label>
+      </div>
+      <div class="url-display" id="urlDisplay">
+        <span class="url-text" id="urlText">Fill in the fields above...</span>
+        <button class="copy-btn" id="copyBtn" onclick="copyUrl()" title="Copy URL">
+          <svg id="copyIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+          </svg>
+          <svg id="checkIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <button class="create-btn" id="createBtn" onclick="create()" disabled>Create</button>
+    <div class="error" id="error"></div>
+  </div>
+
+  <script>
+    const fields = {
+      pageUrl: document.getElementById('pageUrl'),
+      utmSource: document.getElementById('utmSource'),
+      utmMedium: document.getElementById('utmMedium'),
+      utmCampaign: document.getElementById('utmCampaign'),
+      utmTerm: document.getElementById('utmTerm'),
+      utmContent: document.getElementById('utmContent'),
+    };
+    const urlDisplay = document.getElementById('urlDisplay');
+    const urlText = document.getElementById('urlText');
+    const copyBtn = document.getElementById('copyBtn');
+    const copyIcon = document.getElementById('copyIcon');
+    const checkIcon = document.getElementById('checkIcon');
+    const createBtn = document.getElementById('createBtn');
+    const errorDiv = document.getElementById('error');
+    const toggle = document.getElementById('toggle');
+    const toggleTrack = document.getElementById('toggleTrack');
+    const toggleLabel = document.getElementById('toggleLabel');
+
+    let fullUrl = '';
+    let shortUrl = '';
+    let showingShort = false;
+
+    // Live preview on every keystroke
+    Object.values(fields).forEach(input => {
+      input.addEventListener('input', updatePreview);
+    });
+
+    function buildUtmUrl() {
+      const base = fields.pageUrl.value.trim();
+      if (!base) return '';
+
+      try { new URL(base); } catch { return ''; }
+
+      const params = new URLSearchParams();
+      if (fields.utmSource.value.trim()) params.set('utm_source', fields.utmSource.value.trim());
+      if (fields.utmMedium.value.trim()) params.set('utm_medium', fields.utmMedium.value.trim());
+      if (fields.utmCampaign.value.trim()) params.set('utm_campaign', fields.utmCampaign.value.trim());
+      if (fields.utmTerm.value.trim()) params.set('utm_term', fields.utmTerm.value.trim());
+      if (fields.utmContent.value.trim()) params.set('utm_content', fields.utmContent.value.trim());
+
+      const paramStr = params.toString();
+      if (!paramStr) return base;
+
+      const separator = base.includes('?') ? '&' : '?';
+      return base + separator + paramStr;
+    }
+
+    function isValid() {
+      const base = fields.pageUrl.value.trim();
+      try { new URL(base); } catch { return false; }
+      return (
+        fields.utmSource.value.trim() &&
+        fields.utmMedium.value.trim() &&
+        fields.utmCampaign.value.trim()
+      );
+    }
+
+    function updatePreview() {
+      fullUrl = buildUtmUrl();
+
+      // Reset short URL when form changes
+      if (shortUrl) {
+        shortUrl = '';
+        showingShort = false;
+        toggle.classList.remove('visible');
+        toggleTrack.classList.remove('active');
+        toggleLabel.textContent = 'Show short';
+        urlDisplay.classList.remove('has-short');
+      }
+
+      if (fullUrl) {
+        urlText.textContent = fullUrl;
+      } else {
+        urlText.textContent = 'Fill in the fields above...';
+      }
+
+      createBtn.disabled = !isValid();
+      errorDiv.classList.remove('visible');
+    }
+
+    function toggleView() {
+      showingShort = !showingShort;
+      if (showingShort) {
+        toggleTrack.classList.add('active');
+        toggleLabel.textContent = 'Show full';
+        urlText.innerHTML = '<a href="' + shortUrl + '" target="_blank">' + shortUrl + '</a>';
+      } else {
+        toggleTrack.classList.remove('active');
+        toggleLabel.textContent = 'Show short';
+        urlText.innerHTML = '<a href="' + fullUrl + '" target="_blank">' + escapeHtml(fullUrl) + '</a>';
+      }
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    async function create() {
+      if (!isValid()) return;
+
+      fullUrl = buildUtmUrl();
+      errorDiv.classList.remove('visible');
+      createBtn.disabled = true;
+      createBtn.textContent = 'Creating...';
+
+      try {
+        const res = await fetch('/api/shorten', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: fullUrl }),
+        });
+        const data = await res.json();
+
+        if (!res.ok) throw new Error(data.error || 'Something went wrong');
+
+        shortUrl = data.shortUrl;
+        showingShort = true;
+
+        // Show short URL
+        urlDisplay.classList.add('has-short');
+        urlText.innerHTML = '<a href="' + shortUrl + '" target="_blank">' + shortUrl + '</a>';
+
+        // Show toggle
+        toggle.classList.add('visible');
+        toggleTrack.classList.add('active');
+        toggleLabel.textContent = 'Show full';
+      } catch (err) {
+        errorDiv.textContent = err.message;
+        errorDiv.classList.add('visible');
+      } finally {
+        createBtn.disabled = false;
+        createBtn.textContent = 'Create';
+      }
+    }
+
+    function copyUrl() {
+      const urlToCopy = showingShort ? shortUrl : fullUrl;
+      if (!urlToCopy) return;
+
+      navigator.clipboard.writeText(urlToCopy).then(() => {
+        copyIcon.style.display = 'none';
+        checkIcon.style.display = 'block';
+        setTimeout(() => {
+          copyIcon.style.display = 'block';
+          checkIcon.style.display = 'none';
+        }, 2000);
+      });
+    }
+  </script>
+</body>
+</html>

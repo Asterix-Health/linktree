@@ -2,7 +2,7 @@ const UPSTASH_URL = process.env.KV_REST_API_URL;
 const UPSTASH_TOKEN = process.env.KV_REST_API_TOKEN;
 
 async function redis(command) {
-  const res = await fetch(`${UPSTASH_URL}`, {
+  const r = await fetch(`${UPSTASH_URL}`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${UPSTASH_TOKEN}`,
@@ -11,19 +11,16 @@ async function redis(command) {
     body: JSON.stringify(command),
     signal: AbortSignal.timeout(10000),
   });
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`Redis error ${res.status}: ${text}`);
+  if (!r.ok) {
+    const text = await r.text();
+    throw new Error(`Redis error ${r.status}: ${text}`);
   }
-  return (await res.json()).result;
+  return (await r.json()).result;
 }
 
-export default async function handler(req) {
+export default async function handler(req, res) {
   if (req.method !== "GET") {
-    return new Response(JSON.stringify({ error: "Method not allowed" }), {
-      status: 405,
-      headers: { "Content-Type": "application/json" },
-    });
+    return res.status(405).json({ error: "Method not allowed" });
   }
 
   try {
@@ -34,19 +31,13 @@ export default async function handler(req) {
       redis(["SMEMBERS", "suggestions:campaign"]),
     ]);
 
-    return new Response(
-      JSON.stringify({
-        pageUrl: pageUrl || [],
-        source: source || [],
-        medium: medium || [],
-        campaign: campaign || [],
-      }),
-      { status: 200, headers: { "Content-Type": "application/json" } }
-    );
+    return res.status(200).json({
+      pageUrl: pageUrl || [],
+      source: source || [],
+      medium: medium || [],
+      campaign: campaign || [],
+    });
   } catch (err) {
-    return new Response(
-      JSON.stringify({ error: err.message }),
-      { status: 502, headers: { "Content-Type": "application/json" } }
-    );
+    return res.status(502).json({ error: err.message });
   }
 }

@@ -45,37 +45,18 @@ function isAllowedUrl(urlString) {
   );
 }
 
-export default async function handler(req) {
+export default async function handler(req, res) {
   if (req.method !== "POST") {
-    return new Response(JSON.stringify({ error: "Method not allowed" }), {
-      status: 405,
-      headers: { "Content-Type": "application/json" },
-    });
+    return res.status(405).json({ error: "Method not allowed" });
   }
 
-  let body;
-  try {
-    body = await req.json();
-  } catch {
-    return new Response(JSON.stringify({ error: "Invalid JSON" }), {
-      status: 400,
-      headers: { "Content-Type": "application/json" },
-    });
-  }
-
-  const { url } = body;
+  const { url } = req.body;
   if (!url || typeof url !== "string") {
-    return new Response(JSON.stringify({ error: "Missing url" }), {
-      status: 400,
-      headers: { "Content-Type": "application/json" },
-    });
+    return res.status(400).json({ error: "Missing url" });
   }
 
   if (!isAllowedUrl(url)) {
-    return new Response(
-      JSON.stringify({ error: "URL must be under an allowed Asterix domain" }),
-      { status: 400, headers: { "Content-Type": "application/json" } }
-    );
+    return res.status(400).json({ error: "URL must be under an allowed Asterix domain" });
   }
 
   try {
@@ -94,18 +75,12 @@ export default async function handler(req) {
     if (campaign) saves.push(redis(["SADD", "suggestions:campaign", campaign]));
     await Promise.all(saves);
 
-    const host = req.headers.get("host") || "links.asterix.health";
-    const protocol = req.headers.get("x-forwarded-proto") || "https";
-    const shortUrl = `${protocol}://${host}/${code}`;
+    const host = req.headers.host || "links.asterix.health";
+    const proto = req.headers["x-forwarded-proto"] || "https";
+    const shortUrl = `${proto}://${host}/${code}`;
 
-    return new Response(
-      JSON.stringify({ code, shortUrl, originalUrl: url }),
-      { status: 200, headers: { "Content-Type": "application/json" } }
-    );
+    return res.status(200).json({ code, shortUrl, originalUrl: url });
   } catch (err) {
-    return new Response(
-      JSON.stringify({ error: err.message }),
-      { status: 502, headers: { "Content-Type": "application/json" } }
-    );
+    return res.status(502).json({ error: err.message });
   }
 }

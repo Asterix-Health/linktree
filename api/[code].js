@@ -2,7 +2,7 @@ const UPSTASH_URL = process.env.KV_REST_API_URL;
 const UPSTASH_TOKEN = process.env.KV_REST_API_TOKEN;
 
 async function redis(command) {
-  const res = await fetch(`${UPSTASH_URL}`, {
+  const r = await fetch(`${UPSTASH_URL}`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${UPSTASH_TOKEN}`,
@@ -11,11 +11,11 @@ async function redis(command) {
     body: JSON.stringify(command),
     signal: AbortSignal.timeout(10000),
   });
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`Redis error ${res.status}: ${text}`);
+  if (!r.ok) {
+    const text = await r.text();
+    throw new Error(`Redis error ${r.status}: ${text}`);
   }
-  return (await res.json()).result;
+  return (await r.json()).result;
 }
 
 const notFoundHtml = `<!DOCTYPE html>
@@ -46,28 +46,18 @@ const notFoundHtml = `<!DOCTYPE html>
 </body>
 </html>`;
 
-export default async function handler(req) {
-  const url = new URL(req.url, "http://localhost");
-  const code = url.pathname.replace("/api/", "");
+export default async function handler(req, res) {
+  const code = req.query.code;
 
   if (!code || !/^[a-f0-9]{8}$/.test(code)) {
-    return new Response(notFoundHtml, {
-      status: 404,
-      headers: { "Content-Type": "text/html" },
-    });
+    return res.status(404).setHeader("Content-Type", "text/html").send(notFoundHtml);
   }
 
   const target = await redis(["GET", `short:${code}`]);
 
   if (!target) {
-    return new Response(notFoundHtml, {
-      status: 404,
-      headers: { "Content-Type": "text/html" },
-    });
+    return res.status(404).setHeader("Content-Type", "text/html").send(notFoundHtml);
   }
 
-  return new Response(null, {
-    status: 302,
-    headers: { Location: target },
-  });
+  return res.redirect(302, target);
 }

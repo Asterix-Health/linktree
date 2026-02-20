@@ -1,4 +1,10 @@
-import { kv } from "@vercel/kv";
+import { Redis } from "@upstash/redis";
+
+const redis = new Redis({
+  url: process.env.KV_REST_API_URL,
+  token: process.env.KV_REST_API_TOKEN,
+  signal: () => AbortSignal.timeout(10000),
+});
 
 const notFoundHtml = `<!DOCTYPE html>
 <html lang="en">
@@ -39,7 +45,7 @@ export default async function handler(req) {
     });
   }
 
-  const target = await kv.get(`short:${code}`);
+  const target = await redis.get(`short:${code}`);
 
   if (!target) {
     return new Response(notFoundHtml, {

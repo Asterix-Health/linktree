@@ -1,4 +1,10 @@
-import { kv } from "@vercel/kv";
+import { Redis } from "@upstash/redis";
+
+const redis = new Redis({
+  url: process.env.KV_REST_API_URL,
+  token: process.env.KV_REST_API_TOKEN,
+  signal: () => AbortSignal.timeout(10000),
+});
 
 export default async function handler(req) {
   if (req.method !== "GET") {
@@ -9,10 +15,10 @@ export default async function handler(req) {
   }
 
   const [pageUrl, source, medium, campaign] = await Promise.all([
-    kv.smembers("suggestions:pageUrl"),
-    kv.smembers("suggestions:source"),
-    kv.smembers("suggestions:medium"),
-    kv.smembers("suggestions:campaign"),
+    redis.smembers("suggestions:pageUrl"),
+    redis.smembers("suggestions:source"),
+    redis.smembers("suggestions:medium"),
+    redis.smembers("suggestions:campaign"),
   ]);
 
   return new Response(

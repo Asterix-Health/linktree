@@ -1,10 +1,22 @@
-import { Redis } from "@upstash/redis";
+const UPSTASH_URL = process.env.KV_REST_API_URL;
+const UPSTASH_TOKEN = process.env.KV_REST_API_TOKEN;
 
-const redis = new Redis({
-  url: process.env.KV_REST_API_URL,
-  token: process.env.KV_REST_API_TOKEN,
-  signal: () => AbortSignal.timeout(10000),
-});
+async function redis(command) {
+  const res = await fetch(`${UPSTASH_URL}`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${UPSTASH_TOKEN}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(command),
+    signal: AbortSignal.timeout(10000),
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Redis error ${res.status}: ${text}`);
+  }
+  return (await res.json()).result;
+}
 
 const notFoundHtml = `<!DOCTYPE html>
 <html lang="en">
@@ -45,7 +57,7 @@ export default async function handler(req) {
     });
   }
 
-  const target = await redis.get(`short:${code}`);
+  const target = await redis(["GET", `short:${code}`]);
 
   if (!target) {
     return new Response(notFoundHtml, {

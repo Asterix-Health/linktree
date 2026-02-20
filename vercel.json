@@ -1,6 +1,6 @@
 {
   "cleanUrls": true,
   "rewrites": [
-    { "source": "/:code", "destination": "/api/:code" }
+    { "source": "/:code([a-f0-9]{8})", "destination": "/api/:code" }
   ]
 }

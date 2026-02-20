@@ -70,6 +70,61 @@
     .field input::placeholder {
       color: #555;
     }
+    .combobox {
+      position: relative;
+    }
+    .combobox input {
+      padding-right: 2.5rem;
+    }
+    .combobox-chevron {
+      position: absolute;
+      right: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 16px;
+      height: 16px;
+      color: #555;
+      pointer-events: none;
+      transition: transform 0.15s;
+    }
+    .combobox.open .combobox-chevron {
+      transform: translateY(-50%) rotate(180deg);
+    }
+    .combobox-list {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      margin-top: 4px;
+      background: #1a1a1a;
+      border: 1px solid #333;
+      border-radius: 8px;
+      max-height: 180px;
+      overflow-y: auto;
+      z-index: 10;
+    }
+    .combobox.open .combobox-list {
+      display: block;
+    }
+    .combobox-option {
+      padding: 0.6rem 1rem;
+      font-size: 0.9rem;
+      color: #ccc;
+      cursor: pointer;
+      transition: background 0.1s;
+    }
+    .combobox-option:hover,
+    .combobox-option.active {
+      background: #292929;
+      color: #fff;
+    }
+    .combobox-empty {
+      padding: 0.6rem 1rem;
+      font-size: 0.85rem;
+      color: #555;
+      font-style: italic;
+    }
     .preview {
       margin-top: 1rem;
       margin-bottom: 1rem;
@@ -210,19 +265,35 @@
 
     <div class="field">
       <label>Page URL <span class="req">*</span></label>
-      <input type="url" id="pageUrl" placeholder="https://asterix.health/..." autocomplete="off">
+      <div class="combobox" data-key="pageUrl">
+        <input type="url" id="pageUrl" placeholder="https://asterix.health/..." autocomplete="off">
+        <svg class="combobox-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        <div class="combobox-list"></div>
+      </div>
     </div>
     <div class="field">
       <label>utm_source <span class="req">*</span></label>
-      <input type="text" id="utmSource" placeholder="e.g. google, newsletter" autocomplete="off">
+      <div class="combobox" data-key="source">
+        <input type="text" id="utmSource" placeholder="e.g. google, newsletter" autocomplete="off">
+        <svg class="combobox-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        <div class="combobox-list"></div>
+      </div>
     </div>
     <div class="field">
       <label>utm_medium <span class="req">*</span></label>
-      <input type="text" id="utmMedium" placeholder="e.g. cpc, email, social" autocomplete="off">
+      <div class="combobox" data-key="medium">
+        <input type="text" id="utmMedium" placeholder="e.g. cpc, email, social" autocomplete="off">
+        <svg class="combobox-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        <div class="combobox-list"></div>
+      </div>
     </div>
     <div class="field">
       <label>utm_campaign <span class="req">*</span></label>
-      <input type="text" id="utmCampaign" placeholder="e.g. spring_sale" autocomplete="off">
+      <div class="combobox" data-key="campaign">
+        <input type="text" id="utmCampaign" placeholder="e.g. spring_sale" autocomplete="off">
+        <svg class="combobox-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        <div class="combobox-list"></div>
+      </div>
     </div>
     <div class="field">
       <label>utm_term</label>
@@ -284,6 +355,89 @@
     let fullUrl = '';
     let shortUrl = '';
     let showingShort = false;
+
+    // Combobox suggestions
+    const suggestions = { pageUrl: [], source: [], medium: [], campaign: [] };
+
+    fetch('/api/suggestions')
+      .then(r => r.ok ? r.json() : {})
+      .then(data => {
+        Object.assign(suggestions, data);
+      })
+      .catch(() => {});
+
+    function initComboboxes() {
+      document.querySelectorAll('.combobox').forEach(wrapper => {
+        const key = wrapper.dataset.key;
+        const input = wrapper.querySelector('input');
+        const list = wrapper.querySelector('.combobox-list');
+        let activeIdx = -1;
+
+        function render() {
+          const val = input.value.toLowerCase();
+          const items = suggestions[key].filter(s => s.toLowerCase().includes(val));
+          list.innerHTML = '';
+          activeIdx = -1;
+          if (items.length === 0) {
+            list.innerHTML = '<div class="combobox-empty">No suggestions</div>';
+            return;
+          }
+          items.forEach((item, i) => {
+            const div = document.createElement('div');
+            div.className = 'combobox-option';
+            div.textContent = item;
+            div.addEventListener('mousedown', e => {
+              e.preventDefault();
+              input.value = item;
+              close();
+              input.dispatchEvent(new Event('input'));
+            });
+            list.appendChild(div);
+          });
+        }
+
+        function open() {
+          render();
+          wrapper.classList.add('open');
+        }
+
+        function close() {
+          wrapper.classList.remove('open');
+          activeIdx = -1;
+        }
+
+        input.addEventListener('focus', open);
+        input.addEventListener('input', () => {
+          if (wrapper.classList.contains('open')) render();
+        });
+        input.addEventListener('blur', () => {
+          setTimeout(close, 150);
+        });
+        input.addEventListener('keydown', e => {
+          if (!wrapper.classList.contains('open')) return;
+          const options = list.querySelectorAll('.combobox-option');
+          if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            activeIdx = Math.min(activeIdx + 1, options.length - 1);
+            options.forEach((o, i) => o.classList.toggle('active', i === activeIdx));
+            options[activeIdx]?.scrollIntoView({ block: 'nearest' });
+          } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            activeIdx = Math.max(activeIdx - 1, 0);
+            options.forEach((o, i) => o.classList.toggle('active', i === activeIdx));
+            options[activeIdx]?.scrollIntoView({ block: 'nearest' });
+          } else if (e.key === 'Enter' && activeIdx >= 0) {
+            e.preventDefault();
+            input.value = options[activeIdx].textContent;
+            close();
+            input.dispatchEvent(new Event('input'));
+          } else if (e.key === 'Escape') {
+            close();
+          }
+        });
+      });
+    }
+    initComboboxes();
 
     // Live preview on every keystroke
     Object.values(fields).forEach(input => {
@@ -382,6 +536,12 @@
 
         shortUrl = data.shortUrl;
         showingShort = true;
+
+        // Refresh suggestions with newly saved values
+        fetch('/api/suggestions')
+          .then(r => r.ok ? r.json() : {})
+          .then(d => Object.assign(suggestions, d))
+          .catch(() => {});
 
         // Show short URL
         urlDisplay.classList.add('has-short');

@@ -1,10 +1,5 @@
-import { Redis } from "@upstash/redis";
+import { kv } from "@vercel/kv";
 import { randomBytes } from "crypto";
-
-const redis = new Redis({
-  url: process.env.KV_REST_API_URL,
-  token: process.env.KV_REST_API_TOKEN,
-});
 
 const ALLOWED_DOMAINS = [
   "asterix.health",
@@ -65,7 +60,19 @@ export default async function handler(req) {
   }
 
   const code = randomBytes(4).toString("hex");
-  await redis.set(`short:${code}`, url);
+  await kv.set(`short:${code}`, url);
+
+  // Save suggestions for combobox auto-populate
+  const parsed = new URL(url);
+  const baseUrl = parsed.origin + parsed.pathname;
+  const saves = [kv.sadd("suggestions:pageUrl", baseUrl)];
+  const source = parsed.searchParams.get("utm_source");
+  const medium = parsed.searchParams.get("utm_medium");
+  const campaign = parsed.searchParams.get("utm_campaign");
+  if (source) saves.push(kv.sadd("suggestions:source", source));
+  if (medium) saves.push(kv.sadd("suggestions:medium", medium));
+  if (campaign) saves.push(kv.sadd("suggestions:campaign", campaign));
+  await Promise.all(saves);
 
   const host = req.headers.get("host") || "links.asterix.health";
   const protocol = req.headers.get("x-forwarded-proto") || "https";

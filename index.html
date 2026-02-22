@@ -163,10 +163,12 @@
     }
 
     .logo {
-      width: min(50vw, 180px);
+      width: 540px;
+      max-width: 100%;
       user-select: none;
       -webkit-user-drag: none;
       padding-top: 40px;
+      filter: brightness(0);
     }
 
     /* Modal overlay */
@@ -389,6 +391,11 @@
 
       .link-card {
         padding: 18px 20px;
+      }
+
+      .logo {
+        width: calc(100vw - 32px);
+        padding-top: 32px;
       }
 
       .modal-overlay {

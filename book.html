@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book a Call – Asterix</title>
+  <link rel="icon" type="image/png" href="assets/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Libre+Caslon+Text:wght@400;700&display=swap" rel="stylesheet">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-GTVX4RHL5Z"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-GTVX4RHL5Z');
+  </script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: #000;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      color: #fff;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 24px 0;
+      position: relative;
+    }
+
+    .back-link {
+      position: absolute;
+      left: 24px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 14px;
+      font-weight: 500;
+      transition: color 0.15s ease;
+      padding: 8px 4px;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .back-link:hover {
+      color: #fff;
+    }
+
+    .back-link svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    .header-logo {
+      width: 120px;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+
+    .page-intro {
+      text-align: center;
+      padding: 32px 24px 24px;
+    }
+
+    .page-title {
+      font-family: 'Libre Caslon Text', 'Georgia', serif;
+      font-size: 26px;
+      font-weight: 400;
+      margin-bottom: 8px;
+      letter-spacing: -0.01em;
+    }
+
+    .page-subtitle {
+      font-size: 15px;
+      color: rgba(255, 255, 255, 0.45);
+    }
+
+    .cal-wrapper {
+      flex: 1;
+      width: 100%;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 0 24px 48px;
+    }
+
+    /* Style the Cal.com embed iframe container */
+    .cal-inline {
+      width: 100%;
+      min-height: 600px;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    @media (max-width: 480px) {
+      .header {
+        padding: 24px 16px 0;
+        padding-top: max(24px, env(safe-area-inset-top));
+      }
+
+      .back-link {
+        left: 16px;
+      }
+
+      .page-intro {
+        padding: 24px 16px 20px;
+      }
+
+      .page-title {
+        font-size: 22px;
+      }
+
+      .cal-wrapper {
+        padding: 0 12px 40px;
+        padding-bottom: max(40px, env(safe-area-inset-bottom));
+      }
+
+      .cal-inline {
+        min-height: 500px;
+        border-radius: 12px;
+      }
+    }
+
+    @media (max-width: 360px) {
+      .cal-wrapper {
+        padding: 0 8px 32px;
+      }
+
+      .cal-inline {
+        border-radius: 8px;
+      }
+
+      .page-title {
+        font-size: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <a href="/" class="back-link">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+      </svg>
+      Back
+    </a>
+    <img src="assets/logo.png" alt="Asterix" class="header-logo">
+  </div>
+
+  <div class="page-intro">
+    <h1 class="page-title">Book a call with Julian</h1>
+    <p class="page-subtitle">Pick a time that works for you.</p>
+  </div>
+
+  <div class="cal-wrapper">
+    <div class="cal-inline" id="cal-embed"></div>
+  </div>
+
+  <!-- Cal.com embed -->
+  <script type="text/javascript">
+    (function (C, A, L) {
+      let p = function (a, ar) { a.q.push(ar); };
+      let d = C.document;
+      C.Cal = C.Cal || function () {
+        let cal = C.Cal;
+        let ar = arguments;
+        if (!cal.loaded) {
+          cal.ns = {};
+          cal.q = cal.q || [];
+          d.head.appendChild(d.createElement("script")).src = A;
+          cal.loaded = true;
+        }
+        if (ar[0] === L) {
+          const api = function () { p(api, arguments); };
+          const namespace = ar[1];
+          api.q = api.q || [];
+          if (typeof namespace === "string") {
+            cal.ns[namespace] = cal.ns[namespace] || api;
+            p(cal.ns[namespace], ar);
+            p(cal, ["initNamespace", namespace]);
+          } else p(cal, ar);
+          return;
+        }
+        p(cal, ar);
+      };
+    })(window, "https://app.cal.com/embed/embed.js", "init");
+
+    Cal("init", "30min", { origin: "https://app.cal.com" });
+
+    Cal.ns["30min"]("inline", {
+      elementOrSelector: "#cal-embed",
+      calLink: "jtitz/30min",
+      layout: "month_view",
+      config: {
+        layout: "month_view",
+        useSlotsViewOnSmallScreen: "true",
+      },
+    });
+
+    Cal.ns["30min"]("ui", {
+      hideEventTypeDetails: false,
+      layout: "month_view",
+      cssVarsPerTheme: {
+        dark: {
+          "cal-brand-color": "#4d65ff",
+          "cal-text-color": "#ffffff",
+          "cal-text-emphasis-color": "#ffffff",
+          "cal-border-color": "rgba(255,255,255,0.1)",
+          "cal-border-subtle-color": "rgba(255,255,255,0.06)",
+          "cal-bg-color": "transparent",
+          "cal-bg-emphasis-color": "rgba(255,255,255,0.04)",
+          "cal-bg-subtle-color": "rgba(255,255,255,0.02)",
+          "cal-bg-muted-color": "rgba(255,255,255,0.06)",
+          "cal-bg-inverted-color": "#4d65ff",
+        },
+      },
+      theme: "dark",
+    });
+  </script>
+</body>
+</html>

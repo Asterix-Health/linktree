@@ -5,9 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Asterix</title>
   <link rel="icon" type="image/png" href="assets/logo.png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Libre+Caslon+Text:wght@400;700&display=swap" rel="stylesheet">
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-GTVX4RHL5Z"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
@@ -16,16 +13,56 @@
     gtag('config', 'G-GTVX4RHL5Z');
   </script>
   <style>
+    @font-face {
+      font-family: 'Neue Haas Display';
+      src: url('fonts/neue-haas/NeueHaasDisplayRoman.ttf') format('truetype');
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'Neue Haas Display';
+      src: url('fonts/neue-haas/NeueHaasDisplayMediu.ttf') format('truetype');
+      font-weight: 500;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'Neue Haas Display';
+      src: url('fonts/neue-haas/NeueHaasDisplayBold.ttf') format('truetype');
+      font-weight: 600;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'Neue Haas Display';
+      src: url('fonts/neue-haas/NeueHaasDisplayBold.ttf') format('truetype');
+      font-weight: 700;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'Tiempos Fine';
+      src: url('fonts/tiempos/TiemposFine-Regular.otf') format('opentype');
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'Tiempos Fine';
+      src: url('fonts/tiempos/TiemposFine-Bold.otf') format('opentype');
+      font-weight: 700;
+      font-style: normal;
+      font-display: swap;
+    }
+
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
       min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #000;
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      color: #fff;
+      background: linear-gradient(180deg, #C9DBD2 0%, #f5f8f6 100%);
+      font-family: 'Neue Haas Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      color: #1a1a1a;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
     }
@@ -33,17 +70,19 @@
     .container {
       width: 100%;
       max-width: 480px;
-      padding: 48px 24px 64px;
+      margin: 0 auto;
+      min-height: 100vh;
+      padding: 48px 24px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 40px;
     }
 
-    .logo {
-      width: min(60vw, 240px);
-      user-select: none;
-      -webkit-user-drag: none;
+    .links-wrapper {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      width: 100%;
     }
 
     .links {
@@ -56,36 +95,25 @@
     .link-card {
       display: block;
       width: 100%;
-      padding: 20px 24px;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 14px;
+      padding: 18px 24px;
+      background: #ffffff;
+      border: none;
+      border-radius: 100px;
       text-decoration: none;
-      color: #fff;
+      color: #1a1a1a;
       text-align: center;
       transition: all 0.2s ease;
       cursor: pointer;
       position: relative;
       overflow: hidden;
-    }
-
-    .link-card::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, rgba(77, 101, 255, 0.08), transparent);
-      opacity: 0;
-      transition: opacity 0.2s ease;
+      font-family: inherit;
+      font-size: inherit;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
     }
 
     .link-card:hover {
-      background: rgba(255, 255, 255, 0.07);
-      border-color: rgba(77, 101, 255, 0.4);
       transform: translateY(-1px);
-    }
-
-    .link-card:hover::before {
-      opacity: 1;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     }
 
     .link-card:active {
@@ -96,17 +124,14 @@
       font-size: 16px;
       font-weight: 500;
       letter-spacing: -0.01em;
-      position: relative;
-      z-index: 1;
     }
 
     .link-card-sub {
+      display: block;
       font-size: 13px;
-      color: rgba(255, 255, 255, 0.5);
-      margin-top: 6px;
+      color: rgba(0, 0, 0, 0.45);
+      margin-top: 4px;
       font-weight: 400;
-      position: relative;
-      z-index: 1;
     }
 
     .link-card .arrow {
@@ -116,9 +141,8 @@
       transform: translateY(-50%);
       opacity: 0;
       transition: opacity 0.2s ease, transform 0.2s ease;
-      color: rgba(77, 101, 255, 0.8);
+      color: rgba(0, 0, 0, 0.3);
       font-size: 14px;
-      z-index: 1;
     }
 
     .link-card:hover .arrow {
@@ -126,18 +150,18 @@
       transform: translateY(-50%) translateX(2px);
     }
 
-    .footer {
-      font-size: 12px;
-      color: rgba(255, 255, 255, 0.25);
-      text-align: center;
-      letter-spacing: 0.02em;
+    .logo {
+      width: min(50vw, 180px);
+      user-select: none;
+      -webkit-user-drag: none;
+      padding-top: 40px;
     }
 
     /* Modal overlay */
     .modal-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.8);
+      background: rgba(0, 0, 0, 0.5);
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
       display: flex;
@@ -160,13 +184,14 @@
     .modal {
       width: 100%;
       max-width: 440px;
-      background: #111;
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: #ffffff;
+      border: 1px solid rgba(0, 0, 0, 0.08);
       border-radius: 20px;
       padding: 36px 32px 32px;
       transform: translateY(16px) scale(0.97);
       transition: transform 0.25s ease;
       position: relative;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
     }
 
     .modal-overlay.active .modal {
@@ -180,9 +205,9 @@
       width: 32px;
       height: 32px;
       border: none;
-      background: rgba(255, 255, 255, 0.06);
+      background: rgba(0, 0, 0, 0.05);
       border-radius: 8px;
-      color: rgba(255, 255, 255, 0.5);
+      color: rgba(0, 0, 0, 0.4);
       font-size: 18px;
       cursor: pointer;
       display: flex;
@@ -192,21 +217,22 @@
     }
 
     .modal-close:hover {
-      background: rgba(255, 255, 255, 0.1);
-      color: #fff;
+      background: rgba(0, 0, 0, 0.1);
+      color: #1a1a1a;
     }
 
     .modal-title {
-      font-family: 'Libre Caslon Text', 'Georgia', serif;
+      font-family: 'Tiempos Fine', 'Georgia', serif;
       font-size: 22px;
       font-weight: 400;
       margin-bottom: 6px;
       letter-spacing: -0.01em;
+      color: #1a1a1a;
     }
 
     .modal-subtitle {
       font-size: 14px;
-      color: rgba(255, 255, 255, 0.45);
+      color: rgba(0, 0, 0, 0.45);
       margin-bottom: 28px;
     }
 
@@ -231,7 +257,7 @@
     .form-label {
       font-size: 12px;
       font-weight: 500;
-      color: rgba(255, 255, 255, 0.5);
+      color: rgba(0, 0, 0, 0.45);
       text-transform: uppercase;
       letter-spacing: 0.06em;
     }
@@ -239,10 +265,10 @@
     .form-input {
       width: 100%;
       padding: 12px 14px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(0, 0, 0, 0.03);
+      border: 1px solid rgba(0, 0, 0, 0.1);
       border-radius: 10px;
-      color: #fff;
+      color: #1a1a1a;
       font-family: inherit;
       font-size: 16px;
       outline: none;
@@ -252,19 +278,19 @@
     }
 
     .form-input::placeholder {
-      color: rgba(255, 255, 255, 0.2);
+      color: rgba(0, 0, 0, 0.25);
     }
 
     .form-input:focus {
-      border-color: rgba(77, 101, 255, 0.6);
-      background: rgba(77, 101, 255, 0.04);
+      border-color: rgba(0, 0, 0, 0.3);
+      background: rgba(0, 0, 0, 0.01);
     }
 
     .form-submit {
       width: 100%;
       padding: 14px;
       margin-top: 8px;
-      background: #4d65ff;
+      background: #1a1a1a;
       border: none;
       border-radius: 10px;
       color: #fff;
@@ -277,7 +303,7 @@
     }
 
     .form-submit:hover {
-      background: #5a70ff;
+      background: #333;
       transform: translateY(-1px);
     }
 
@@ -300,28 +326,30 @@
       width: 48px;
       height: 48px;
       border-radius: 50%;
-      background: rgba(77, 101, 255, 0.15);
+      background: rgba(0, 0, 0, 0.06);
       display: flex;
       align-items: center;
       justify-content: center;
       margin: 0 auto 16px;
       font-size: 24px;
+      color: #1a1a1a;
     }
 
     .form-success-title {
       font-size: 18px;
       font-weight: 600;
       margin-bottom: 8px;
+      color: #1a1a1a;
     }
 
     .form-success-text {
       font-size: 14px;
-      color: rgba(255, 255, 255, 0.5);
+      color: rgba(0, 0, 0, 0.5);
     }
 
     .form-error {
       font-size: 13px;
-      color: #ff6b6b;
+      color: #d32f2f;
       margin-top: 8px;
       text-align: center;
       display: none;
@@ -330,30 +358,25 @@
     /* Touch active states for mobile */
     @media (hover: none) {
       .link-card:active {
-        background: rgba(255, 255, 255, 0.07);
-        border-color: rgba(77, 101, 255, 0.4);
-      }
-
-      .link-card:active::before {
-        opacity: 1;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
       }
 
       .link-card .arrow {
-        opacity: 0.5;
+        opacity: 0.4;
         transform: translateY(-50%);
       }
     }
 
     @media (max-width: 480px) {
       .container {
-        padding: 40px 20px 56px;
+        padding: 40px 20px;
         padding-top: max(40px, env(safe-area-inset-top));
-        padding-bottom: max(56px, env(safe-area-inset-bottom));
-        gap: 32px;
+        padding-bottom: max(40px, env(safe-area-inset-bottom));
       }
 
       .link-card {
-        padding: 18px 20px;
+        padding: 16px 20px;
       }
 
       .modal-overlay {
@@ -378,27 +401,27 @@
 </head>
 <body>
   <div class="container">
-    <img src="assets/logo.png" alt="Asterix" class="logo">
+    <div class="links-wrapper">
+      <div class="links">
+        <a href="/book" class="link-card">
+          <span class="link-card-title">Book a call with Julian</span>
+          <span class="arrow">&rarr;</span>
+        </a>
 
-    <div class="links">
-      <a href="/book" class="link-card">
-        <span class="link-card-title">Book a call with Julian</span>
-        <span class="arrow">&rarr;</span>
-      </a>
+        <a href="https://calculator.asterix.health" target="_blank" rel="noopener" class="link-card">
+          <span class="link-card-title">Access the calculator</span>
+          <span class="link-card-sub">Find out how much time you could save with Asterix</span>
+          <span class="arrow">&rarr;</span>
+        </a>
 
-      <a href="https://calculator.asterix.health" target="_blank" rel="noopener" class="link-card">
-        <span class="link-card-title">Access the calculator</span>
-        <span class="link-card-sub">Find out how much time you could save with Asterix</span>
-        <span class="arrow">&rarr;</span>
-      </a>
-
-      <button class="link-card" id="contactBtn" type="button">
-        <span class="link-card-title">Get in touch</span>
-        <span class="arrow">&rarr;</span>
-      </button>
+        <button class="link-card" id="contactBtn" type="button">
+          <span class="link-card-title">Get in touch</span>
+          <span class="arrow">&rarr;</span>
+        </button>
+      </div>
     </div>
 
-    <p class="footer">asterix.health</p>
+    <img src="assets/logo.png" alt="Asterix" class="logo">
   </div>
 
   <!-- Contact Modal -->
@@ -501,7 +524,7 @@
       }
 
       submitBtn.disabled = true;
-      submitBtn.textContent = 'Submitting…';
+      submitBtn.textContent = 'Submitting\u2026';
 
       try {
         const res = await fetch('/api/contact', {

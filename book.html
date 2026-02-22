@@ -5,9 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Book a Call – Asterix</title>
   <link rel="icon" type="image/png" href="assets/logo.png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Libre+Caslon+Text:wght@400;700&display=swap" rel="stylesheet">
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-GTVX4RHL5Z"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
@@ -16,15 +13,58 @@
     gtag('config', 'G-GTVX4RHL5Z');
   </script>
   <style>
+    @font-face {
+      font-family: 'Neue Haas Display';
+      src: url('fonts/neue-haas/NeueHaasDisplayRoman.ttf') format('truetype');
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'Neue Haas Display';
+      src: url('fonts/neue-haas/NeueHaasDisplayMediu.ttf') format('truetype');
+      font-weight: 500;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'Neue Haas Display';
+      src: url('fonts/neue-haas/NeueHaasDisplayBold.ttf') format('truetype');
+      font-weight: 600;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'Neue Haas Display';
+      src: url('fonts/neue-haas/NeueHaasDisplayBold.ttf') format('truetype');
+      font-weight: 700;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'Tiempos Fine';
+      src: url('fonts/tiempos/TiemposFine-Regular.otf') format('opentype');
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'Tiempos Fine';
+      src: url('fonts/tiempos/TiemposFine-Bold.otf') format('opentype');
+      font-weight: 700;
+      font-style: normal;
+      font-display: swap;
+    }
+
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
       min-height: 100vh;
       display: flex;
       flex-direction: column;
-      background: #000;
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      color: #fff;
+      background: linear-gradient(180deg, #C9DBD2 0%, #f5f8f6 100%);
+      font-family: 'Neue Haas Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      color: #1a1a1a;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
     }
@@ -44,7 +84,7 @@
       align-items: center;
       gap: 6px;
       text-decoration: none;
-      color: rgba(255, 255, 255, 0.5);
+      color: rgba(0, 0, 0, 0.45);
       font-size: 14px;
       font-weight: 500;
       transition: color 0.15s ease;
@@ -53,7 +93,7 @@
     }
 
     .back-link:hover {
-      color: #fff;
+      color: #1a1a1a;
     }
 
     .back-link svg {
@@ -73,22 +113,23 @@
     }
 
     .page-title {
-      font-family: 'Libre Caslon Text', 'Georgia', serif;
+      font-family: 'Tiempos Fine', 'Georgia', serif;
       font-size: 26px;
       font-weight: 400;
       margin-bottom: 8px;
       letter-spacing: -0.01em;
+      color: #1a1a1a;
     }
 
     .page-subtitle {
       font-size: 15px;
-      color: rgba(255, 255, 255, 0.45);
+      color: rgba(0, 0, 0, 0.45);
     }
 
     .cal-wrapper {
       flex: 1;
       width: 100%;
-      max-width: 1000px;
+      max-width: 1200px;
       margin: 0 auto;
       padding: 0 24px 48px;
     }
@@ -96,11 +137,22 @@
     /* Style the Cal.com embed iframe container */
     .cal-inline {
       width: 100%;
-      min-height: 600px;
+      min-height: 750px;
       border-radius: 16px;
       overflow: hidden;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      background: rgba(255, 255, 255, 0.6);
+    }
+
+    .footer {
+      text-align: center;
+      padding: 0 24px 32px;
+    }
+
+    .footer-logo {
+      width: min(40vw, 140px);
+      user-select: none;
+      -webkit-user-drag: none;
     }
 
     @media (max-width: 480px) {
@@ -167,6 +219,10 @@
     <div class="cal-inline" id="cal-embed"></div>
   </div>
 
+  <div class="footer">
+    <img src="assets/logo.png" alt="Asterix" class="footer-logo">
+  </div>
+
   <!-- Cal.com embed -->
   <script type="text/javascript">
     (function (C, A, L) {
@@ -212,20 +268,20 @@
       hideEventTypeDetails: false,
       layout: "month_view",
       cssVarsPerTheme: {
-        dark: {
-          "cal-brand-color": "#4d65ff",
-          "cal-text-color": "#ffffff",
-          "cal-text-emphasis-color": "#ffffff",
-          "cal-border-color": "rgba(255,255,255,0.1)",
-          "cal-border-subtle-color": "rgba(255,255,255,0.06)",
+        light: {
+          "cal-brand-color": "#1a1a1a",
+          "cal-text-color": "#1a1a1a",
+          "cal-text-emphasis-color": "#1a1a1a",
+          "cal-border-color": "rgba(0,0,0,0.1)",
+          "cal-border-subtle-color": "rgba(0,0,0,0.06)",
           "cal-bg-color": "transparent",
-          "cal-bg-emphasis-color": "rgba(255,255,255,0.04)",
-          "cal-bg-subtle-color": "rgba(255,255,255,0.02)",
-          "cal-bg-muted-color": "rgba(255,255,255,0.06)",
-          "cal-bg-inverted-color": "#4d65ff",
+          "cal-bg-emphasis-color": "rgba(0,0,0,0.04)",
+          "cal-bg-subtle-color": "rgba(0,0,0,0.02)",
+          "cal-bg-muted-color": "rgba(0,0,0,0.06)",
+          "cal-bg-inverted-color": "#1a1a1a",
         },
       },
-      theme: "dark",
+      theme: "light",
     });
   </script>
 </body>

@@ -101,12 +101,6 @@
       height: 16px;
     }
 
-    .header-logo {
-      width: 120px;
-      user-select: none;
-      -webkit-user-drag: none;
-    }
-
     .page-intro {
       text-align: center;
       padding: 32px 24px 24px;
@@ -150,9 +144,11 @@
     }
 
     .footer-logo {
-      width: min(40vw, 140px);
+      width: 540px;
+      max-width: 100%;
       user-select: none;
       -webkit-user-drag: none;
+      filter: brightness(0);
     }
 
     @media (max-width: 480px) {
@@ -207,7 +203,6 @@
       </svg>
       Back
     </a>
-    <img src="assets/logo.png" alt="Asterix" class="header-logo">
   </div>
 
   <div class="page-intro">

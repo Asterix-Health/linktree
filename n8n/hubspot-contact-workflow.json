@@ -1,0 +1,354 @@
+{
+  "name": "Get in Touch → HubSpot Contact",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "contact-form",
+        "options": {
+          "responseMode": "lastNode"
+        }
+      },
+      "id": "webhook-trigger",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300],
+      "webhookId": "contact-form"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "check-email",
+              "leftValue": "={{ $json.email }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "isNotEmpty"
+              }
+            },
+            {
+              "id": "check-firstname",
+              "leftValue": "={{ $json.firstName }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "isNotEmpty"
+              }
+            },
+            {
+              "id": "check-lastname",
+              "leftValue": "={{ $json.lastName }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "isNotEmpty"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "validation",
+      "name": "Validate Fields",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "resource": "contact",
+        "operation": "search",
+        "filterType": "manual",
+        "filters": {
+          "propertyName": "email",
+          "operator": "EQ",
+          "value": "={{ $json.email }}"
+        },
+        "additionalFields": {}
+      },
+      "id": "search-contact",
+      "name": "Search HubSpot Contact",
+      "type": "n8n-nodes-base.hubspot",
+      "typeVersion": 2,
+      "position": [680, 200],
+      "credentials": {
+        "hubspotOAuth2Api": {
+          "id": "HUBSPOT_CREDENTIAL_ID",
+          "name": "HubSpot OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "has-results",
+              "leftValue": "={{ $json.total }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "check-exists",
+      "name": "Contact Exists?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [900, 200]
+    },
+    {
+      "parameters": {
+        "resource": "contact",
+        "operation": "create",
+        "email": "={{ $('Webhook').item.json.email }}",
+        "additionalFields": {
+          "firstName": "={{ $('Webhook').item.json.firstName }}",
+          "lastName": "={{ $('Webhook').item.json.lastName }}",
+          "phone": "={{ $('Webhook').item.json.phone }}",
+          "customPropertiesUi": {
+            "customPropertiesValues": [
+              {
+                "property": "gp_practice",
+                "value": "={{ $('Webhook').item.json.practice }}"
+              },
+              {
+                "property": "lead_source",
+                "value": "best practice london 2026"
+              }
+            ]
+          }
+        }
+      },
+      "id": "create-contact",
+      "name": "Create HubSpot Contact",
+      "type": "n8n-nodes-base.hubspot",
+      "typeVersion": 2,
+      "position": [1140, 100],
+      "credentials": {
+        "hubspotOAuth2Api": {
+          "id": "HUBSPOT_CREDENTIAL_ID",
+          "name": "HubSpot OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "contact",
+        "operation": "update",
+        "contactId": "={{ $('Search HubSpot Contact').item.json.results[0].id }}",
+        "email": "={{ $('Webhook').item.json.email }}",
+        "updateFields": {
+          "firstName": "={{ $('Webhook').item.json.firstName }}",
+          "lastName": "={{ $('Webhook').item.json.lastName }}",
+          "phone": "={{ $('Webhook').item.json.phone }}",
+          "customPropertiesUi": {
+            "customPropertiesValues": [
+              {
+                "property": "gp_practice",
+                "value": "={{ $('Webhook').item.json.practice }}"
+              },
+              {
+                "property": "lead_source",
+                "value": "best practice london 2026"
+              }
+            ]
+          }
+        }
+      },
+      "id": "update-contact",
+      "name": "Update HubSpot Contact",
+      "type": "n8n-nodes-base.hubspot",
+      "typeVersion": 2,
+      "position": [1140, 300],
+      "credentials": {
+        "hubspotOAuth2Api": {
+          "id": "HUBSPOT_CREDENTIAL_ID",
+          "name": "HubSpot OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "status",
+              "value": "success"
+            },
+            {
+              "name": "message",
+              "value": "Contact created in HubSpot"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "success-response-create",
+      "name": "Success (Created)",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [1360, 100]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "status",
+              "value": "success"
+            },
+            {
+              "name": "message",
+              "value": "Contact updated in HubSpot"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "success-response-update",
+      "name": "Success (Updated)",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [1360, 300]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "status",
+              "value": "error"
+            },
+            {
+              "name": "message",
+              "value": "Validation failed: missing required fields"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "validation-error",
+      "name": "Validation Error",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [680, 420]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Validate Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Fields": {
+      "main": [
+        [
+          {
+            "node": "Search HubSpot Contact",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Validation Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search HubSpot Contact": {
+      "main": [
+        [
+          {
+            "node": "Contact Exists?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Contact Exists?": {
+      "main": [
+        [
+          {
+            "node": "Update HubSpot Contact",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create HubSpot Contact",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create HubSpot Contact": {
+      "main": [
+        [
+          {
+            "node": "Success (Created)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update HubSpot Contact": {
+      "main": [
+        [
+          {
+            "node": "Success (Updated)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "name": "contact-form"
+    },
+    {
+      "name": "hubspot"
+    },
+    {
+      "name": "best-practice-london-2026"
+    }
+  ],
+  "triggerCount": 1
+}
